@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim as brotli-wasm-builder
+FROM debian:11.6-slim as brotli-wasm-builder
 WORKDIR /workspace
 RUN apt-get update && \
     apt-get install -y cmake make git lbzip2 python3 xz-utils && \
@@ -13,7 +13,7 @@ RUN cd emsdk && . ./emsdk_env.sh && cd .. && ./build-brotli.sh -w -t install/
 FROM scratch as brotli-wasm-export
 COPY --from=brotli-wasm-builder /workspace/install/ /
 
-FROM debian:bullseye-slim as brotli-library-builder
+FROM debian:11.6-slim as brotli-library-builder
 WORKDIR /workspace
 COPY build-brotli.sh .
 COPY brotli brotli
@@ -118,7 +118,7 @@ RUN NITRO_BUILD_IGNORE_TIMESTAMPS=1 make build-jit
 FROM scratch as prover-export
 COPY --from=prover-builder /workspace/target/ /
 
-FROM debian:bullseye-slim as module-root-calc
+FROM debian:11.6-slim as module-root-calc
 WORKDIR /workspace
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
@@ -135,7 +135,7 @@ COPY ./solgen ./solgen
 COPY ./contracts ./contracts
 RUN NITRO_BUILD_IGNORE_TIMESTAMPS=1 make build-replay-env
 
-FROM debian:bullseye-slim as machine-versions
+FROM debian:11.6-slim as machine-versions
 RUN apt-get update && apt-get install -y unzip wget curl
 WORKDIR /workspace/machines
 # Download WAVM machines
@@ -175,7 +175,7 @@ RUN mkdir -p target/bin
 COPY .nitro-tag.txt /nitro-tag.txt
 RUN NITRO_BUILD_IGNORE_TIMESTAMPS=1 make build
 
-FROM debian:bullseye-slim as nitro-node-slim
+FROM debian:11.6-slim as nitro-node-slim
 WORKDIR /home/user
 COPY --from=node-builder /workspace/target/bin/nitro /usr/local/bin/
 COPY --from=node-builder /workspace/target/bin/relay /usr/local/bin/
